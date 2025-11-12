@@ -82,8 +82,7 @@ app.get("/upcoming-social-steps", async (req, res) => {
 
 
 
-   ///hbhguhjuhnk
-   //jkguhjuhlkijlki
+  
    //Get all joined events by a user
   
        app.get("/joined-events/:email",verifyToken, async (req, res) => {
