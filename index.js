@@ -63,24 +63,34 @@ async function run() {
    const joinedCollection = db.collection('joined');
 
    // upcoming collections of api 
-   app.get('/upcoming-social-steps', async (req, res) => {
+   // upcoming events with optional filter & search
+app.get("/upcoming-social-steps", async (req, res) => {
   try {
+    const { type, search } = req.query; // from frontend ?type=Workshop&search=tree
     const today = new Date();
-    const { type } = req.query; // query param ধরছি
 
-    // ডিফল্ট query
-    const query = { eventDate: { $gte: today.toISOString() } };
+    let query = { eventDate: { $gte: today.toISOString() } };
 
-    // যদি filter দেওয়া থাকে
-    if (type) query.eventType = type;
+    if (type) {
+      query.eventType = type; // filter by event type
+    }
 
-    const events = await socialStepsCollection.find(query).toArray();
+    if (search) {
+      query.eventTitle = { $regex: search, $options: "i" }; // search by event name (case-insensitive)
+    }
 
-    res.send({ success: true, data: events });
-  } catch (err) {
-    res.status(500).send({ success: false, message: err.message });
+    const result = await socialStepsCollection.find(query).toArray();
+
+    res.send({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    console.error("Fetch Upcoming Events Error:", error);
+    res.status(500).send({ success: false, message: "Internal server error" });
   }
 });
+
 
    ///hbhguhjuhnk
    //jkguhjuhlkijlki
