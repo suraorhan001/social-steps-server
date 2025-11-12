@@ -65,31 +65,21 @@ async function run() {
    // upcoming collections of api 
    // upcoming events with optional filter & search
 app.get("/upcoming-social-steps", async (req, res) => {
-  try {
-    const { type, search } = req.query; // from frontend ?type=Workshop&search=tree
-    const today = new Date();
+  const { type, search } = req.query;
+  const today = new Date();
+  const filter = { eventDate: { $gte: today.toISOString() } };
 
-    let query = { eventDate: { $gte: today.toISOString() } };
+  if (type) filter.eventType = type;
+  if (search) filter.eventTitle = { $regex: search, $options: "i" };
 
-    if (type) {
-      query.eventType = type; // filter by event type
-    }
+  const result = await socialStepsCollection.find(filter).toArray();
 
-    if (search) {
-      query.eventTitle = { $regex: search, $options: "i" }; // search by event name (case-insensitive)
-    }
-
-    const result = await socialStepsCollection.find(query).toArray();
-
-    res.send({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    console.error("Fetch Upcoming Events Error:", error);
-    res.status(500).send({ success: false, message: "Internal server error" });
-  }
+  res.send({
+    success: true,
+    data: result,
+  });
 });
+
 
 
    ///hbhguhjuhnk
