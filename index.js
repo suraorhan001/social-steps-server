@@ -63,8 +63,8 @@ async function run() {
    const joinedCollection = db.collection('joined');
 
    // upcoming collections of api 
-   // upcoming events with optional filter & search
-app.get("/upcoming-social-steps", async (req, res) => {
+
+   app.get("/upcoming-social-steps", async (req, res) => {
   const { type, search } = req.query;
   const today = new Date();
   const filter = { eventDate: { $gte: today.toISOString() } };
