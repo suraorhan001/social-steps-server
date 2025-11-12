@@ -63,25 +63,25 @@ async function run() {
    const joinedCollection = db.collection('joined');
 
    // upcoming collections of api 
-   app.get('/upcoming-social-steps',async(req,res)=>{
-     
-   const today = new Date();
-  const result = await socialStepsCollection.find({eventDate:{$gte:today.toISOString()}}).toArray()
-  
+   app.get('/upcoming-social-steps', async (req, res) => {
+  try {
+    const today = new Date();
+    const { type } = req.query; // query param ধরছি
 
-    res.send(result)
-   })
+    // ডিফল্ট query
+    const query = { eventDate: { $gte: today.toISOString() } };
 
-   //event details er jonno click card er id get korchi
+    // যদি filter দেওয়া থাকে
+    if (type) query.eventType = type;
 
-   app.get('/upcoming-social-steps/:id',async(req,res)=>{
-    const {id} = req.params
-    const result = await socialStepsCollection.findOne({_id : new ObjectId(id)})
-    res.send({
-      success :true,
-      result
-    })
-   })
+    const events = await socialStepsCollection.find(query).toArray();
+
+    res.send({ success: true, data: events });
+  } catch (err) {
+    res.status(500).send({ success: false, message: err.message });
+  }
+});
+
    ///hbhguhjuhnk
    //jkguhjuhlkijlki
    //Get all joined events by a user
