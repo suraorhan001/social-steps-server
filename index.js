@@ -67,7 +67,7 @@ async function run() {
    app.get("/upcoming-social-steps", async (req, res) => {
   const { type, search } = req.query;
   const today = new Date();
-  const filter = { eventDate: { $gte: today.toISOString() } };
+  const filter = { eventDate: { $gte: today } };
 
   if (type) filter.eventType = type;
   if (search) filter.eventTitle = { $regex: search, $options: "i" };
@@ -79,6 +79,7 @@ async function run() {
     data: result,
   });
 });
+
 
 
 
@@ -106,7 +107,7 @@ async function run() {
     console.error("Get Joined Events Error:", error);
     res.status(500).send({ success: false, message: "Internal server error" });
   }
-});
+   });
 
   /// get all the  cards created by currentuser
 
@@ -128,12 +129,31 @@ async function run() {
     res.status(500).send({ success: false, message: "Internal server error" });
   }
 });
+// get single event by id
+app.get("/upcoming-social-steps/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const event = await socialStepsCollection.findOne({ _id: new ObjectId(id) });
+
+    if (!event) {
+      return res.status(404).send({ success: false, message: "Event not found" });
+    }
+
+    res.send({
+      success: true,
+      result: event,
+    });
+  } catch (error) {
+    console.error("Get single event error:", error);
+    res.status(500).send({ success: false, message: "Internal server error" });
+  }
+});
 
 
 
    
   // event create korchi
-  app.post('/upcoming-social-steps',async (req,res)=>{
+  app.post('/upcoming-social-steps',verifyToken,async (req,res)=>{
     const data = req.body
     console.log(data)
     const result = await socialStepsCollection.insertOne(data)
@@ -184,7 +204,7 @@ app.post("/join-event", async (req, res) => {
   }
    });
    //user nijer create kora event update korbe
-// user nijer create kora event update korbe
+    // user nijer create kora event update korbe
     app.put("/update-event/:id",verifyToken ,async (req, res) => {
   try {
     const { id } = req.params;
@@ -208,7 +228,7 @@ app.post("/join-event", async (req, res) => {
       message: "Internal server error",
     });
   }
-});
+  });
 
 
 
@@ -230,7 +250,7 @@ app.post("/join-event", async (req, res) => {
     console.error("Delete Event Error:", err);
     res.status(500).send({ success: false, message: "Internal server error" });
   }
-});
+    });
 
 
 

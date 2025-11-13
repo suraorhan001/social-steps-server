@@ -1,3 +1,4 @@
 node_modules
 .env
 social-platforms-firebase-sdk.json
+.vercel
