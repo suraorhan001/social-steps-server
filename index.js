@@ -67,22 +67,28 @@ async function run() {
    app.get("/upcoming-social-steps", async (req, res) => {
   try {
     const { type, search } = req.query;
-    const today = new Date(); // MongoDB Date type সঙ্গে তুলনা
+    const today = new Date();
 
-    const filter = { eventDate: { $gte: today } }; // toISOString() সরানো
+    
+    const filter = { eventDate: { $gte: today.toISOString() } };
 
+ 
     if (type) filter.eventType = type;
-    if (search) filter.eventTitle = { $regex: search, $options: "i" };
+
+   
+    if (search) filter.title = { $regex: search, $options: "i" };
 
     const result = await socialStepsCollection.find(filter).toArray();
 
-    res.send({ success: true, data: result });
+    res.send({
+      success: true,
+      data: result,
+    });
   } catch (error) {
-    console.error("Get Upcoming Events Error:", error);
-    res.status(500).send({ success: false, message: "Internal server error" });
+    console.error("Upcoming Events Error:", error);
+    res.status(500).send({ success: false, message: "Internal Server Error" });
   }
 });
-
 
 
   
