@@ -57,7 +57,7 @@ const verifyToken = async (req,res,next)=>{
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-   
+  
    const db = client.db('social-db')
    const socialStepsCollection = db.collection("socielsteps")
    const joinedCollection = db.collection('joined');
@@ -65,21 +65,23 @@ async function run() {
    // upcoming collections of api 
 
    app.get("/upcoming-social-steps", async (req, res) => {
-  const { type, search } = req.query;
-  const today = new Date();
-  const filter = { eventDate: { $gte: today } };
+  try {
+    const { type, search } = req.query;
+    const today = new Date(); // MongoDB Date type সঙ্গে তুলনা
 
-  if (type) filter.eventType = type;
-  if (search) filter.eventTitle = { $regex: search, $options: "i" };
+    const filter = { eventDate: { $gte: today } }; // toISOString() সরানো
 
-  const result = await socialStepsCollection.find(filter).toArray();
+    if (type) filter.eventType = type;
+    if (search) filter.eventTitle = { $regex: search, $options: "i" };
 
-  res.send({
-    success: true,
-    data: result,
-  });
+    const result = await socialStepsCollection.find(filter).toArray();
+
+    res.send({ success: true, data: result });
+  } catch (error) {
+    console.error("Get Upcoming Events Error:", error);
+    res.status(500).send({ success: false, message: "Internal server error" });
+  }
 });
-
 
 
 
